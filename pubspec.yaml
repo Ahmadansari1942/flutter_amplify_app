@@ -1,7 +1,7 @@
 name: flutter_amplify_app
-description: Simple Flutter Web App for AWS Amplify
+description: AhmadBlog Style Flutter Web UI
 publish_to: 'none'
-version: 1.0.0
+version: 2.0.0
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
