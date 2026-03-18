@@ -3,11 +3,11 @@ frontend:
   phases:
     preBuild:
       commands:
-        # Download Flutter (Linux)
-        - curl -L https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.19.0-stable.tar.xz -o flutter.tar.xz
+        # Download Flutter ZIP (no xz needed)
+        - curl -L https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.19.0-stable.zip -o flutter.zip
         
-        # Extract
-        - tar -xf flutter.tar.xz
+        # Extract zip
+        - unzip flutter.zip
 
         # Set PATH
         - export PATH="$PATH:`pwd`/flutter/bin"
@@ -15,12 +15,12 @@ frontend:
         # Enable web
         - flutter config --enable-web
 
-        # Install deps
+        # Install dependencies
         - flutter pub get
 
     build:
       commands:
-        # Build web
+        # Build Flutter Web
         - flutter build web
 
   artifacts:
