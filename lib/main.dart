@@ -205,3 +205,21 @@ Future<List<dynamic>> fetchPosts() async {
     throw Exception('Failed to load posts');
   }
 }
+FutureBuilder<List<dynamic>>(
+  future: fetchPosts(),
+  builder: (context, snapshot) {
+    if (snapshot.connectionState == ConnectionState.waiting) {
+      return CircularProgressIndicator();
+    } else if (snapshot.hasError) {
+      return Text('Error: ${snapshot.error}');
+    } else {
+      final posts = snapshot.data!;
+      return Column(
+        children: posts.map((post) => ListTile(
+          title: Text(post['title']),
+          subtitle: Text(post['content']),
+        )).toList(),
+      );
+    }
+  },
+)
