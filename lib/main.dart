@@ -1,5 +1,13 @@
-
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -14,6 +22,18 @@ import 'package:flutter/material.dart';
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
+  // EC2 backend API URL
+  final String apiUrl = "http://<EC2-PUBLIC-IP>:3000/posts";
+
+  Future<List<dynamic>> fetchPosts() async {
+    final response = await http.get(Uri.parse(apiUrl));
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception('Failed to load posts');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,7 +41,6 @@ class HomePage extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           children: [
-
             // 🔝 Navbar
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
@@ -59,7 +78,7 @@ class HomePage extends StatelessWidget {
                           ),
                         ),
                       ),
- const SizedBox(width: 15),
+                      const SizedBox(width: 15),
                       ElevatedButton(
                         onPressed: () {},
                         child: const Text('Create Article'),
@@ -109,58 +128,63 @@ class HomePage extends StatelessWidget {
                 ],
               ),
             ),
-     // 🏷 Categories
-            Wrap(
-              spacing: 10,
-              children: const [
-                Chip(label: Text('All')),
-                Chip(label: Text('Apps')),
-                Chip(label: Text('Art')),
-                Chip(label: Text('Books')),
-                Chip(label: Text('Health')),
-                Chip(label: Text('Movies')),
-              ],
-            ),
 
-            const SizedBox(height: 30),
-
-            // 📰 Blog Card
-            Container(
-              margin: const EdgeInsets.symmetric(horizontal: 40),
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Colors.white10,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 200,
-                    height: 120,
-                    decoration: BoxDecoration(
-                      color: Colors.green,
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                  ),
-                  const SizedBox(width: 20),
-                  const Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Building Scalable Apps',
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(height: 10),
-                        Text(
-                          'Learn how to build modern scalable applications...',
-                          style: TextStyle(color: Colors.white60),
-                        ),
-                      ],
-                    ),
-                  )
-                ],
+            // 📰 Blog Posts from backend
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 40),
+              child: FutureBuilder<List<dynamic>>(
+                future: fetchPosts(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Text('Error: ${snapshot.error}');
+                  } else {
+                    final posts = snapshot.data!;
+                    return Column(
+                      children: posts.map((post) {
+                        return Container(
+                          margin: const EdgeInsets.symmetric(vertical: 10),
+                          padding: const EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                            color: Colors.white10,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 200,
+                                height: 120,
+                                decoration: BoxDecoration(
+                                  color: Colors.green,
+                                  borderRadius: BorderRadius.circular(15),
+                                ),
+                              ),
+                              const SizedBox(width: 20),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      post['title'],
+                                      style: const TextStyle(
+                                          fontSize: 20, fontWeight: FontWeight.bold),
+                                    ),
+                                    const SizedBox(height: 10),
+                                    Text(
+                                      post['content'],
+                                      style: const TextStyle(color: Colors.white60),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                    );
+                  }
+                },
               ),
             ),
 
@@ -171,6 +195,7 @@ class HomePage extends StatelessWidget {
     );
   }
 }
+
 class StatBox extends StatelessWidget {
   final String title;
   final String value;
@@ -193,31 +218,6 @@ class StatBox extends StatelessWidget {
     );
   }
 }
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-
-Future<List<dynamic>> fetchPosts() async {
-  final response = await http.get(Uri.parse("http://13.233.143.117:3000/posts"));
-
-  if (response.statusCode == 200) {
-    return jsonDecode(response.body);
-  } else {
-    throw Exception('Failed to load posts');
-  }
-}
-FutureBuilder<List<dynamic>>(
-  future: fetchPosts(),
-  builder: (context, snapshot) {
-    if (snapshot.connectionState == ConnectionState.waiting) {
-      return CircularProgressIndicator();
-    } else if (snapshot.hasError) {
-      return Text('Error: ${snapshot.error}');
-    } else {
-      final posts = snapshot.data!;
-      return Column(
-        children: posts.map((post) => ListTile(
-          title: Text(post['title']),
-          subtitle: Text(post['content']),
         )).toList(),
       );
     }
