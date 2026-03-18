@@ -3,19 +3,25 @@ frontend:
   phases:
     preBuild:
       commands:
+        - echo "Clearing caches..."
+        - rm -rf ~/.pub-cache/hosted/pub.dev/http*
+        - rm -rf .dart_tool
+        - rm -rf build
         - git clone https://github.com/flutter/flutter.git -b stable
         - export PATH="$PATH:`pwd`/flutter/bin"
         - flutter doctor
+        - flutter clean
         - flutter pub get
     build:
       commands:
-        - flutter build web --release --dart-define=FLUTTER_WEB_USE_SKIA=false --no-wasm-dry-run
+        - echo "Building Flutter Web..."
+        - flutter build web --release --no-wasm-dry-run
   artifacts:
     baseDirectory: build/web
     files:
       - '**/*'
   cache:
     paths:
-      - ~/.pub-cache
       - flutter/**/*
+      - .pub-cache/**/*
       - .dart_tool/**/*
