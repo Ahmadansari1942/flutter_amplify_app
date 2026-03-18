@@ -23,7 +23,8 @@ class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
   // EC2 backend API URL
-  final String apiUrl = "http://<EC2-PUBLIC-IP>:3000/posts";
+  final String apiUrl = "http://<13.233.143.117>:3000/posts";
+  String.fromEnvironment('API_URL')
 
   Future<List<dynamic>> fetchPosts() async {
     final response = await http.get(Uri.parse(apiUrl));
