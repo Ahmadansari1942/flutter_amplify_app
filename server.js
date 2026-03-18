@@ -35,3 +35,18 @@ app.post("/posts", async (req, res) => {
 });
 
 app.listen(3000, () => console.log("Server running"));
+
+
+const allowedOrigins = ["
+https://main.d1427t43v1id7x.amplifyapp.com"];
+
+app.use(cors({
+  origin: function(origin, callback){
+    if(!origin) return callback(null, true);
+    if(allowedOrigins.indexOf(origin) === -1){
+      const msg = 'CORS policy does not allow access from the specified Origin.';
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  }
+}));
