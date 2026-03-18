@@ -3,13 +3,14 @@ frontend:
   phases:
     preBuild:
       commands:
-        - echo "No build needed (pre-built Flutter web)"
+        - flutter pub get
     build:
       commands:
-        - echo "Skipping build phase"
+        - flutter build web --release
   artifacts:
     baseDirectory: build/web
     files:
       - '**/*'
   cache:
-    paths: []
+    paths:
+      - ~/.pub-cache
