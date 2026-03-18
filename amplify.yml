@@ -3,32 +3,13 @@ frontend:
   phases:
     preBuild:
       commands:
-        # Download Flutter ZIP (no xz needed)
-        - curl -L https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.19.0-stable.zip -o flutter.zip
-        
-        # Extract zip
-        - unzip flutter.zip
-
-        # Set PATH
-        - export PATH="$PATH:`pwd`/flutter/bin"
-
-        # Enable web
-        - flutter config --enable-web
-
-        # Install dependencies
-        - flutter pub get
-
+        - echo "No build needed (pre-built Flutter web)"
     build:
       commands:
-        # Build Flutter Web
-        - flutter build web
-
+        - echo "Skipping build phase"
   artifacts:
     baseDirectory: build/web
     files:
       - '**/*'
-
   cache:
-    paths:
-      - flutter/**
-      - .pub-cache/**/*
+    paths: []
