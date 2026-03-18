@@ -7,10 +7,11 @@ app.use(cors());
 app.use(express.json());
 
 // MongoDB connect
-mongoose.connect("YOUR_MONGO_URL")
-  .then(() => console.log("MongoDB Connected"))
-  .catch(err => console.log(err));
+const mongoose = require("mongoose");
 
+mongoose.connect("mongodb://13.233.143.117:27017/blog_db")
+  .then(() => console.log("MongoDB connected"))
+  .catch(err => console.error("MongoDB connection error:", err));
 // Schema
 const Post = mongoose.model("Post", {
   title: String,
