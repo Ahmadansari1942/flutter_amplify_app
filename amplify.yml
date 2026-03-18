@@ -3,10 +3,7 @@ frontend:
   phases:
     preBuild:
       commands:
-        # Basic tools
-        - yum install -y unzip curl git xz
-
-        # Download Flutter (Linux version - important ⚠️)
+        # Download Flutter (Linux)
         - curl -L https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.19.0-stable.tar.xz -o flutter.tar.xz
         
         # Extract
@@ -18,15 +15,12 @@ frontend:
         # Enable web
         - flutter config --enable-web
 
-        # Check (optional but useful)
-        - flutter doctor
-
-        # Get dependencies
+        # Install deps
         - flutter pub get
 
     build:
       commands:
-        # Build web app
+        # Build web
         - flutter build web
 
   artifacts:
