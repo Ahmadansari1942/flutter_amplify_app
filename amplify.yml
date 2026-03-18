@@ -3,16 +3,38 @@ frontend:
   phases:
     preBuild:
       commands:
-        - npm install -g flutter
+        # Basic tools
+        - yum install -y unzip curl git xz
+
+        # Download Flutter (Linux version - important ⚠️)
+        - curl -L https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.19.0-stable.tar.xz -o flutter.tar.xz
+        
+        # Extract
+        - tar -xf flutter.tar.xz
+
+        # Set PATH
+        - export PATH="$PATH:`pwd`/flutter/bin"
+
+        # Enable web
         - flutter config --enable-web
+
+        # Check (optional but useful)
+        - flutter doctor
+
+        # Get dependencies
         - flutter pub get
+
     build:
       commands:
+        # Build web app
         - flutter build web
+
   artifacts:
     baseDirectory: build/web
     files:
       - '**/*'
+
   cache:
     paths:
+      - flutter/**
       - .pub-cache/**/*
