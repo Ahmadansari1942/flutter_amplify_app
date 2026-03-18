@@ -3,23 +3,25 @@ frontend:
   phases:
     preBuild:
       commands:
-        - echo "Installing Flutter SDK..."
+        - echo "Step 1: Removing any existing flutter directory..."
+        - rm -rf flutter
+        - echo "Step 2: Cloning Flutter SDK..."
         - git clone https://github.com/flutter/flutter.git -b stable --depth 1
+        - echo "Step 3: Setting up PATH..."
         - export PATH="$PATH:`pwd`/flutter/bin"
-        - echo "Running Flutter Doctor..."
+        - echo "Step 4: Flutter doctor..."
         - flutter doctor
-        - echo "Getting Flutter packages..."
+        - echo "Step 5: Getting packages..."
         - flutter pub get
     build:
       commands:
-        - echo "Building Flutter Web Release..."
-        - flutter build web --release --dart-define=FLUTTER_WEB_USE_SKIA=false
+        - echo "Step 6: Building Flutter Web..."
+        - flutter build web --release
   artifacts:
     baseDirectory: build/web
     files:
       - '**/*'
   cache:
     paths:
-      - flutter/**/*
       - .dart_tool/**/*
       - .pub-cache/**/*
