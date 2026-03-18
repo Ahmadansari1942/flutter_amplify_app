@@ -23,16 +23,18 @@ class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
   // EC2 backend API URL
-final String apiUrl = const String.fromEnvironment(
-  'API_URL',
-  defaultValue: "http://13.233.143.117:3000/posts"
-);
+  static const String apiUrl = "http://13.233.143.117:3000/posts";
+
   Future<List<dynamic>> fetchPosts() async {
-    final response = await http.get(Uri.parse(apiUrl));
-    if (response.statusCode == 200) {
-      return jsonDecode(response.body);
-    } else {
-      throw Exception('Failed to load posts');
+    try {
+      final response = await http.get(Uri.parse(apiUrl));
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else {
+        throw Exception('Failed to load posts - Status: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Error: $e');
     }
   }
 
@@ -131,17 +133,33 @@ final String apiUrl = const String.fromEnvironment(
               ),
             ),
 
-            // 📰 Blog Posts from backend
+            // 📰 Blog Posts from EC2 backend
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 40),
               child: FutureBuilder<List<dynamic>>(
                 future: fetchPosts(),
-    
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
                   } else if (snapshot.hasError) {
-                    return Text('Error: ${snapshot.error}');
+                    return Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: Colors.red.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: Colors.red),
+                      ),
+                      child: Text(
+                        'Error: ${snapshot.error}',
+                        style: const TextStyle(color: Colors.red),
+                      ),
+                    );
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Center(
+                      child: Text('No posts available'),
+                    );
                   } else {
                     final posts = snapshot.data!;
                     return Column(
@@ -162,6 +180,14 @@ final String apiUrl = const String.fromEnvironment(
                                   color: Colors.green,
                                   borderRadius: BorderRadius.circular(15),
                                 ),
+                                child: post['image'] != null
+                                    ? Image.network(
+                                        post['image'],
+                                        fit: BoxFit.cover,
+                                      )
+                                    : const Center(
+                                        child: Text('No Image'),
+                                      ),
                               ),
                               const SizedBox(width: 20),
                               Expanded(
@@ -169,14 +195,30 @@ final String apiUrl = const String.fromEnvironment(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      post['title'],
+                                      post['title'] ?? 'No Title',
                                       style: const TextStyle(
-                                          fontSize: 20, fontWeight: FontWeight.bold),
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
                                     ),
                                     const SizedBox(height: 10),
                                     Text(
-                                      post['content'],
-                                      style: const TextStyle(color: Colors.white60),
+                                      post['content'] ?? 'No content',
+                                      style: const TextStyle(
+                                        color: Colors.white60,
+                                      ),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    const SizedBox(height: 10),
+                                    Text(
+                                      'By ${post['author'] ?? 'Unknown'}',
+                                      style: const TextStyle(
+                                        color: Colors.white70,
+                                        fontSize: 12,
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -192,6 +234,20 @@ final String apiUrl = const String.fromEnvironment(
             ),
 
             const SizedBox(height: 50),
+
+            // 🔗 Footer
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 30),
+              decoration: BoxDecoration(
+                color: Colors.white10,
+              ),
+              child: const Center(
+                child: Text(
+                  '© 2026 AhmadBlog. All rights reserved.',
+                  style: TextStyle(color: Colors.white60, fontSize: 12),
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -211,18 +267,17 @@ class StatBox extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
         children: [
-          Text(value,
-              style:
-                  const TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
+          Text(
+            value,
+            style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+          ),
           const SizedBox(height: 5),
-          Text(title, style: const TextStyle(color: Colors.white60)),
+          Text(
+            title,
+            style: const TextStyle(color: Colors.white60),
+          ),
         ],
       ),
     );
   }
 }
-        )).toList(),
-      );
-    }
-  },
-)
