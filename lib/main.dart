@@ -23,9 +23,10 @@ class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
   // EC2 backend API URL
-  final String apiUrl = "http://<13.233.143.117>:3000/posts";
-  String.fromEnvironment('API_URL')
-
+final String apiUrl = const String.fromEnvironment(
+  'API_URL',
+  defaultValue: "http://13.233.143.117:3000/posts"
+);
   Future<List<dynamic>> fetchPosts() async {
     final response = await http.get(Uri.parse(apiUrl));
     if (response.statusCode == 200) {
@@ -135,6 +136,7 @@ class HomePage extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 40),
               child: FutureBuilder<List<dynamic>>(
                 future: fetchPosts(),
+    
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());
