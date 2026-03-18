@@ -25,3 +25,5 @@ frontend:
     paths:
       - .dart_tool/**/*
       - .pub-cache/**/*
+    files:
+      - '**/*'
