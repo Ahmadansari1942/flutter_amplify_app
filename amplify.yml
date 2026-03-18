@@ -9,7 +9,7 @@ frontend:
         - flutter pub get
     build:
       commands:
-        - flutter build web --release
+        - flutter build web --release --dart-define=FLUTTER_WEB_USE_SKIA=false --no-wasm-dry-run
   artifacts:
     baseDirectory: build/web
     files:
@@ -17,3 +17,5 @@ frontend:
   cache:
     paths:
       - ~/.pub-cache
+      - flutter/**/*
+      - .dart_tool/**/*
